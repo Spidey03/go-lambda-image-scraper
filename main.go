@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -31,7 +32,17 @@ func main() {
 }
 
 func Handler(event InputEvent) (string, error) {
-	fmt.Println("Function Invoked")
+	fmt.Println(event.Link)
+	fmt.Println(event.Key)
+	image := GetImage(event.Link)
+	_, err := s3session.PutObject(&s3.PutObjectInput{
+		Body:   bytes.NewReader(image),
+		Bucket: aws.String(BUCKET_NAME),
+		Key:    aws.String(event.Key),
+	})
+	if err != nil {
+		return "Something went wrong!!", err
+	}
 	return "Everything worked YaY!!!", err
 }
 
